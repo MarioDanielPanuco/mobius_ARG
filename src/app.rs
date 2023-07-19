@@ -1,4 +1,11 @@
-use egui::Key::P;
+use crate::levels::{AppLevel, Level};
+
+// Define a static array of filepaths
+static FILEPATHS: [&str; 3] = [
+    "/path/to/first/file",
+    "/path/to/second/file",
+    "/path/to/third/file",
+];
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -9,7 +16,7 @@ pub struct TemplateApp {
 
     // this how you opt-out of serialization of a member
     #[serde(skip)]
-    value: f32,
+    value: usize,
 
     passed_l1: bool,
     passed_l2: bool,
@@ -21,7 +28,7 @@ impl Default for TemplateApp {
     fn default() -> Self {
         Self {
             label: "Hello World!".to_owned(),
-            value: 2.7,
+            value: 0,
             passed_l1: false,
             passed_l2: false,
             passed_l3: false,
@@ -61,7 +68,7 @@ impl eframe::App for TemplateApp {
         // For inspiration and more examples, go to https://emilk.github.io/egui
 
 
-        let mut c_history: Vec<String> = vec![]; //TODO: add to app_state
+        let mut c_history: Vec<String> = vec![]; // TODO: add to app_state
         egui::SidePanel::left("chat_area").show(ctx, |ui| {
             ui.heading("Prime Intellect");
 
@@ -75,7 +82,8 @@ impl eframe::App for TemplateApp {
                 c_history.push(label.to_string());
             }
 
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT), |ui| {
+            ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT),
+                           |ui| {
                 ui.horizontal(|ui| {
                     ui.spacing_mut().item_spacing.x = 0.0;
                     ui.label("powered by ");
@@ -91,29 +99,27 @@ impl eframe::App for TemplateApp {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
-
             ui.heading("eframe template");
-
             ui.vertical_centered(|ui| {
                 c_history.iter().for_each(|elem| {
                     ui.label(elem);
                 })
             });
 
+            ui.add(egui::Checkbox::new(&mut self.passed_l1, "Level 1"));
+            ui.add(egui::Checkbox::new(&mut self.passed_l2, "Level 2"));
+            ui.add(egui::Checkbox::new(&mut self.passed_l3, "Level 3"));
+
             egui::warn_if_debug_build(ui);
         });
 
         // egui::SidePanel::right("right_panel").show(ctx, |ui| {});
 
-        if !self.passed_l1
-            && !self.passed_l2
-            && !self.passed_l3 { self.level_1(ctx); };
+        if !self.passed_l1 && !self.passed_l2 && !self.passed_l3 { self.level_1(ctx); };
 
-        if self.passed_l1
-            && !self.passed_l2 { self.level_2(ctx); }
+        if self.passed_l1 && !self.passed_l2 { self.level_2(ctx); }
 
-        if self.passed_l2
-            && !self.passed_l3 { self.level_3(ctx); }
+        if self.passed_l2 && self.passed_l1 { self.level_3(ctx); }
     }
 
     /// Called by the frame work to save state before shutdown.
@@ -140,5 +146,7 @@ impl TemplateApp {
         });
     }
 
-    fn level_3(&mut self, ctx: &egui::Context) { todo!() }
+    fn level_3(&mut self, ctx: &egui::Context) {
+        Level::new("level 3", "Body").show(ctx);
+    }
 }

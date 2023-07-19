@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 
 pub struct ChatMessage {
     user: bool,
@@ -11,6 +12,7 @@ pub struct Chat {
     length: usize,
     // model: llm::Model
 }
+
 impl Chat {
     fn default() -> Self {
         Chat {
@@ -19,8 +21,8 @@ impl Chat {
         }
     }
 
-    fn user_submit(&mut self,) -> Self {
-        todo!()
+    fn user_submit(&mut self, msg: ChatMessage) {
+        self.chat_history.push(msg)
     }
-
 }
+
