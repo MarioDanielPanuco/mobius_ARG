@@ -1,11 +1,14 @@
+use serde::{Deserialize, Serialize};
 use crate::levels::{AppLevel, Level};
 
 // Define a static array of filepaths
 static FILEPATHS: [&str; 3] = [
-    "/path/to/first/file",
-    "/path/to/second/file",
-    "/path/to/third/file",
+    "/assets/text/level_1.md",
+    "/assets/text/level_2.md",
+    "/assets/text/level_3.md",
 ];
+#[derive(Serialize, Deserialize)]
+enum LevelNum { Level1, Level2, Level3 }
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -21,6 +24,8 @@ pub struct TemplateApp {
     passed_l1: bool,
     passed_l2: bool,
     passed_l3: bool,
+
+    lvl_num: LevelNum,
 }
 
 
@@ -32,6 +37,7 @@ impl Default for TemplateApp {
             passed_l1: false,
             passed_l2: false,
             passed_l3: false,
+            lvl_num: LevelNum::Level1
         }
     }
 }
@@ -59,7 +65,8 @@ impl eframe::App for TemplateApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let Self {
             label, value,
-            passed_l1, passed_l2, passed_l3
+            passed_l1, passed_l2, passed_l3,
+            lvl_num,
         } = self;
 
         // Examples of how to create different panels and windows.
@@ -101,11 +108,10 @@ impl eframe::App for TemplateApp {
             // The central panel the region left after adding TopPanel's and SidePanel's
             ui.heading("eframe template");
             ui.vertical_centered(|ui| {
-                c_history.iter().for_each(|elem| {
-                    ui.label(elem);
-                })
+                c_history.iter().for_each(|elem| { ui.label(elem); })
             });
 
+            // ui.checkbox(&mut self.passed_l1, "Level 1");
             ui.add(egui::Checkbox::new(&mut self.passed_l1, "Level 1"));
             ui.add(egui::Checkbox::new(&mut self.passed_l2, "Level 2"));
             ui.add(egui::Checkbox::new(&mut self.passed_l3, "Level 3"));
@@ -115,11 +121,14 @@ impl eframe::App for TemplateApp {
 
         // egui::SidePanel::right("right_panel").show(ctx, |ui| {});
 
-        if !self.passed_l1 && !self.passed_l2 && !self.passed_l3 { self.level_1(ctx); };
-
-        if self.passed_l1 && !self.passed_l2 { self.level_2(ctx); }
-
-        if self.passed_l2 && self.passed_l1 { self.level_3(ctx); }
+        match lvl_num {
+            // Matching Level Windows
+            // LevelNum::Level1 => self.level_1(ctx),
+            LevelNum::Level1 => Level::new("Level 1", "Body 1", value)
+                                    .show(ctx),
+            LevelNum::Level2 => self.level_2(ctx),
+            LevelNum::Level3 => self.level_3(ctx),
+        }
     }
 
     /// Called by the frame work to save state before shutdown.
@@ -147,6 +156,7 @@ impl TemplateApp {
     }
 
     fn level_3(&mut self, ctx: &egui::Context) {
-        Level::new("level 3", "Body").show(ctx);
+        // Level::new("level 3", "Body", ).show(ctx);
+        todo!()
     }
 }

@@ -1,9 +1,8 @@
-use std::fmt::format;
 
 pub fn test(val: &mut i32) { *val += 1; }
 
 pub trait AppLevel {
-    fn new(name: &'static str, context: &'static str) -> Self;
+    fn new(name: &'static str, context: &'static str, health: &mut usize) -> Self;
 
     fn name(&self) -> &'static str;
     fn context(&self) -> &'static str;
@@ -32,11 +31,11 @@ pub struct Level {
 }
 
 impl AppLevel for Level {
-    fn new(name: &'static str, context: &'static str) -> Self {
+    fn new(name: &'static str, context: &'static str, health: &mut usize) -> Self {
         Level {
             name,
             context,
-            user_health: 0,
+            user_health: *health,
         }
     }
 

@@ -18,8 +18,11 @@ log = "0.4"
 
 # You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }
-llm-chain-openai = "0.12.3"
+# llm-chain-openai = "0.12.3"
 # burn = "0.7.0"
+#[dependencies.getrandom]
+#version = "0.2"
+#features = ["js"]
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
