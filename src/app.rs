@@ -1,5 +1,9 @@
+use egui::Widget;
+use egui_graphs::{Graph, GraphView};
+use petgraph::Directed;
 use serde::{Deserialize, Serialize};
 use crate::levels::{AppLevel, Level};
+use crate::graphs::*;
 
 // Define a static array of filepaths
 static FILEPATHS: [&str; 3] = [
@@ -7,6 +11,7 @@ static FILEPATHS: [&str; 3] = [
     "/assets/text/level_2.md",
     "/assets/text/level_3.md",
 ];
+
 #[derive(Serialize, Deserialize)]
 enum LevelNum { Level1, Level2, Level3 }
 
@@ -26,6 +31,9 @@ pub struct TemplateApp {
     passed_l3: bool,
 
     lvl_num: LevelNum,
+
+    #[serde(skip)]
+    mu_graph: Graph<(), (), Directed>,
 }
 
 
@@ -37,7 +45,8 @@ impl Default for TemplateApp {
             passed_l1: false,
             passed_l2: false,
             passed_l3: false,
-            lvl_num: LevelNum::Level1
+            lvl_num: LevelNum::Level1,
+            mu_graph: generate_graph(),
         }
     }
 }
@@ -67,6 +76,7 @@ impl eframe::App for TemplateApp {
             label, value,
             passed_l1, passed_l2, passed_l3,
             lvl_num,
+            mu_graph,
         } = self;
 
         // Examples of how to create different panels and windows.
@@ -98,6 +108,9 @@ impl eframe::App for TemplateApp {
             });
         });
 
+        egui::Window::new("graph").show(ctx, |ui| {
+            ui.add(&mut GraphView::new(mu_graph));
+        });
         egui::SidePanel::right("level_completed").show(ctx, |ui| {
             ui.label(format!("Level 1: {}", passed_l1));
             ui.label(format!("Level 2: {}", passed_l2));
