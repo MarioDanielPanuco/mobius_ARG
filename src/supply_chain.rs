@@ -27,7 +27,8 @@ impl Default for SupplyChainDemo {
     }
 }
 
-
+const MIN_WEIGHT: i32 = 0;
+const MAX_WEIGHT: i32 = 10;
 impl SupplyChainDemo {
     pub fn ui(&mut self, ui: &mut egui::Ui) {
         use egui_extras::{Column, TableBuilder};
@@ -61,7 +62,17 @@ impl SupplyChainDemo {
 
                         for j in 0..self.matrix_buffer[i].len() {
                             row.col(|ui| {
-                                ui.text_edit_singleline(&mut self.matrix_buffer[i][j]);
+                                if let Ok(updated_value) = self.matrix_buffer[i][j].parse::<i32>() {
+                                    // Check if the entered value is within the range
+                                    if (MIN_WEIGHT..=MAX_WEIGHT).contains(&updated_value) {
+                                        self.matrix[i][j] = updated_value;
+                                    } else {
+                                        // This is a simple example, but you could provide feedback to the user here
+                                        // indicating that the entered value is out of range.
+                                        // Reset buffer to old matrix value
+                                        self.matrix_buffer[i][j] = self.matrix[i][j].to_string();
+                                    }
+                                }
                             });
                         }
                     });

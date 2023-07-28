@@ -77,7 +77,7 @@ impl eframe::App for TemplateApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let Self {
             label, value,
-            passed_l1, passed_l2, passed_l3,
+            mut passed_l1, passed_l2, passed_l3,
             lvl_num,
             image_texture,
             supply_chain_demo,
@@ -101,7 +101,9 @@ impl eframe::App for TemplateApp {
 
             if ui.button("Submit").clicked() {
                 c_history.push(label.to_string());
+                if label == "flame" { passed_l1 =  true; }
             }
+
             self.supply_chain_demo.ui(ui);
 
             ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT),
