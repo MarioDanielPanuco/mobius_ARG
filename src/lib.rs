@@ -5,3 +5,4 @@ pub use app::TemplateApp;
 mod chat;
 mod levels;
 mod supply_chain;
+mod survey;

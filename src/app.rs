@@ -2,6 +2,7 @@ use egui::{InnerResponse, Widget};
 use serde::{Deserialize, Serialize};
 use crate::levels::{AppLevel, Level};
 use crate::supply_chain::*;
+use crate::survey::*;
 
 // Define a static array of filepaths
 static FILEPATHS: [&str; 3] = [
@@ -69,7 +70,6 @@ impl TemplateApp {
         Default::default()
     }
 }
-
 
 impl eframe::App for TemplateApp {
     /// Called each time the UI needs repainting, which may be many times per second.
@@ -147,33 +147,6 @@ impl eframe::App for TemplateApp {
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
         eframe::set_value(storage, eframe::APP_KEY, self);
     }
-}
-
-use egui::{RichText, TextStyle, Color32, FontId};
-use image::open;
-
-fn display_image(ui: &mut egui::Ui, path: &str, texture_cache: &mut Option<egui::TextureHandle>) {
-    let texture: &egui::TextureHandle = texture_cache.get_or_insert_with(|| {
-        // Load the texture only once.
-        let img = open(path).expect("Failed to open image").to_rgba8();
-
-        // Convert to egui::ColorImage.
-        let size = [img.width() as usize, img.height() as usize];
-        let pixels = img.into_raw()
-            .chunks_exact(4)
-            .map(|chunk| egui::Color32::from_rgba_premultiplied(chunk[0], chunk[1], chunk[2], chunk[3]))
-            .collect();
-
-        let image_data = egui::ColorImage {
-            size,
-            pixels,
-        };
-
-        ui.ctx().load_texture(path, image_data, Default::default())
-    });
-
-    // Show the image:
-    ui.image(texture, texture.size_vec2());
 }
 
 impl TemplateApp {
@@ -257,4 +230,23 @@ impl TemplateApp {
             });
         });
     }
+
+    fn survey_window(&mut self, ctx: &egui::Context) {
+        let mut survey = Survey::new(vec![
+            "Which planet is known as the Red Planet?".to_string(),
+            "How many planets are in our solar system?".to_string(),
+            // ... add more questions as needed
+        ]);
+
+        egui::Window::new("Survey").show(ctx, |ui| {
+            survey.show_survey(ui);
+
+            if ui.button("Submit").clicked() {
+                // Calculate the percentage of correct answers
+                let percentage = calculate_answers(&survey);
+                ui.label(format!("You got {:.2}% correct", percentage));
+            }
+        });
+    }
 }
+
