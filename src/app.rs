@@ -101,7 +101,7 @@ impl eframe::App for TemplateApp {
 
             if ui.button("Submit").clicked() {
                 c_history.push(label.to_string());
-                if label == "flame" { passed_l1 =  true; }
+                if label == "flame" { self.passed_l1 =  true; }
             }
 
             self.supply_chain_demo.ui(ui);
