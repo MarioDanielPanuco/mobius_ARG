@@ -17,8 +17,8 @@ log = "0.4"
 
 # You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }
-petgraph = "0.6.3"
-egui_graphs = "0.7.3"
+image = "0.24.6"
+egui_extras = "0.22.0"
 #rand = "0.8"
 #crossbeam = "0.8"
 
