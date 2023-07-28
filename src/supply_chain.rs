@@ -67,6 +67,9 @@ impl SupplyChainDemo {
                                         self.matrix[i][j] = updated_value;
                                     }
                                 }
+/*                                ui.add(egui::Slider::
+                                new(&mut self.matrix[i][j], 0..=10));
+*/
                             });
                         }
                     });

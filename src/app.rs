@@ -83,12 +83,6 @@ impl eframe::App for TemplateApp {
             supply_chain_demo,
         } = self;
 
-        // Examples of how to create different panels and windows.
-        // Pick whichever suits you.
-        // Tip: a good default choice is to just keep the `CentralPanel`.
-        // For inspiration and more examples, go to https://emilk.github.io/egui
-
-
         let mut c_history: Vec<String> = vec![]; // TODO: add to app_state
         egui::SidePanel::left("chat_area").show(ctx, |mut ui| {
             ui.heading("Prime Intellect");
@@ -98,21 +92,12 @@ impl eframe::App for TemplateApp {
                 ui.text_edit_multiline(label);
             });
 
-
             if ui.button("Submit").clicked() {
                 c_history.push(label.to_string());
-                if label == "flame" { self.passed_l1 =  true; }
+                if label == "flame" { self.passed_l1=  true; }
             }
 
             self.supply_chain_demo.ui(ui);
-
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::LEFT),
-                           |ui| {
-                               ui.horizontal(|ui| {
-                                   ui.spacing_mut().item_spacing.x = 0.0;
-                                   ui.label("powered by ");
-                               });
-                           });
         });
 
         egui::SidePanel::right("level_completed").show(ctx, |ui| {
@@ -123,7 +108,7 @@ impl eframe::App for TemplateApp {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
-            ui.heading("eframe template");
+            ui.heading("MOBIUS");
             ui.vertical_centered(|ui| {
                 c_history.iter().for_each(|elem| { ui.label(elem); })
             });
@@ -135,7 +120,7 @@ impl eframe::App for TemplateApp {
 
 
             ui.heading("Location");
-            ui.label(format!("Starship Archemdis\n{:} thousand colonists", value));
+            ui.label(format!("Voyager Archimedes\n{:} thousand colonists onboard", value));
             ui.heading("Time");
 
             egui::warn_if_debug_build(ui);
@@ -150,11 +135,9 @@ impl eframe::App for TemplateApp {
             self.lvl_num = LevelNum::Level1;
         } else {}
 
+        // Matching Level Windows
         match self.lvl_num {
-            // Matching Level Windows
-            // LevelNum::Level1 => self.level_1(ctx),
-            LevelNum::Level1 => Level::new("Level 1", "Body 1", value)
-                .show(ctx),
+            LevelNum::Level1 => self.level_1(ctx),
             LevelNum::Level2 => self.level_2(ctx),
             LevelNum::Level3 => self.level_3(ctx),
         }
@@ -193,56 +176,42 @@ fn display_image(ui: &mut egui::Ui, path: &str, texture_cache: &mut Option<egui:
     ui.image(texture, texture.size_vec2());
 }
 
-use image::GenericImageView;
-use crate::supply_chain;
-use crate::supply_chain::SupplyChainDemo;
-
-fn load_image_from_path(path: &std::path::Path) -> Result<egui::ColorImage, image::ImageError> {
-    let image = image::io::Reader::open(path)?.decode()?;
-    let size = [image.width() as _, image.height() as _];
-    let image_buffer = image.to_rgba8();
-
-    let pixels: Vec<egui::Color32> = image_buffer.pixels()
-        .map(|p| egui::Color32::from_rgba_premultiplied(p[0], p[1], p[2], p[3]))
-        .collect();
-
-    Ok(egui::ColorImage {
-        size,
-        pixels,
-    })
-}
-
-fn load_image_from_memory(image_data: &[u8]) -> Result<egui::ColorImage, image::ImageError> {
-    let image = image::load_from_memory(image_data)?;
-    let size = [image.width() as _, image.height() as _];
-    let image_buffer = image.to_rgba8();
-
-    let pixels: Vec<egui::Color32> = image_buffer.pixels()
-        .map(|p| egui::Color32::from_rgba_premultiplied(p[0], p[1], p[2], p[3]))
-        .collect();
-
-    Ok(egui::ColorImage {
-        size,
-        pixels,
-    })
-}
-
-
 impl TemplateApp {
-    fn level_1(&mut self, ctx: &egui::Context) {
-        egui::Window::new("").show(ctx, |ui| {
-            ui.horizontal(|ui| {
-                ui.label("Windows can be moved by dragging them.");
-                ui.hyperlink("webpage.com");
+    fn level_2(&mut self, ctx: &egui::Context) {
+        egui::Window::new("WELCOME TO THE VOYAGE BEYOND").show(ctx, |ui| {
+            // Title
+            // ui.heading("WELCOME TO THE VOYAGE BEYOND");
+
+            // Introductory Paragraph
+            ui.group(|ui| {
+                ui.label("Good day, Voyager.");
+                ui.label("It is the year 2486 AD. You have successfully emerged from cryosleep aboard the Colony Transport Vessel 'Aurora Beacon'. As we journey to our new habitat, we carry with us the legacies, dreams, and hopes of an Earth that once was.");
+
+                // Background History
+                ui.label("When you left Earth, our home was grappling with the consequences of centuries of environmental and societal shifts. Much had been sacrificed, and even more had been lost. However, from the embers of that turmoil, humanity found the strength to embark on this audacious journey.");
+
+                // Prometheus Corp's Role
+                ui.label("Prometheus Corp, the vanguard of innovation, has been the guiding light of this mission. Their advancements have made this voyage possible, and their AGI model, Clarence, is here to assist in our transition. As we step into our new roles, remember:");
+
+                // Key Philosophies
+                    ui.label("1. Collaboration is Vital: We are pioneers of a new era. By working together, we can overcome the challenges that lie ahead.");
+                    ui.label("2. Trust in Technology: The advanced systems and AGI onboard are designed for our collective well-being. Embrace them as our allies.");
+                    ui.label("3. Build Anew with Respect: As we lay the foundations of a new civilization, let's learn from Earth's past, ensuring our actions are guided by reverence and sustainability.");
+
+                // Closing Paragraph
+                ui.label("You have been selected not just for your expertise and skills but for the shared vision of a brighter tomorrow. While this mission offers unparalleled challenges, the possibilities for rejuvenation and rebirth are boundless.");
+                ui.label("The ship is now in orientation mode. Once you've gathered your bearings, a detailed briefing will be provided about our current status, our destination, and the initial tasks ahead.");
+                ui.label("Welcome to a new chapter of human history. Together, we shape our destiny.");
             });
+
         });
     }
 
 
-    fn level_2(&mut self, ctx: &egui::Context) {
+    fn level_1(&mut self, ctx: &egui::Context) {
         egui::Window::new("Prometheus Corp.").show(ctx, |ui| {
             // Title
-            ui.heading("Prometheus Corp."); // This is a simple label now.
+            // ui.heading("Prometheus Corp."); // This is a simple label now.
 
             // Tagline (We'll just use a normal label for now)
             ui.label("\"Illuminating the Path to True Progress\"");
