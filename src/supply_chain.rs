@@ -1,6 +1,7 @@
 pub struct SupplyChainDemo {
     // Represents the adjacency matrix
     matrix: Vec<Vec<i32>>,
+    matrix_buffer: Vec<Vec<String>>,
     nodes: Vec<String>,
 }
 
@@ -18,10 +19,14 @@ impl Default for SupplyChainDemo {
             vec![0, 0, 0, 1],
             vec![0, 0, 0, 0],
         ];
+        let matrix_buffer = matrix.iter().map(|row| {
+            row.iter().map(|&value| value.to_string()).collect::<Vec<_>>()
+        }).collect::<Vec<_>>();
 
-        SupplyChainDemo { matrix, nodes }
+        SupplyChainDemo { matrix, matrix_buffer, nodes }
     }
 }
+
 
 impl SupplyChainDemo {
     pub fn ui(&mut self, ui: &mut egui::Ui) {
@@ -47,27 +52,20 @@ impl SupplyChainDemo {
                 });
             }
         })
-        .body(|mut body| {
-            for (i, node) in self.nodes.iter().enumerate() {
-                body.row(30.0, |mut row| {
-                    row.col(|ui| {
-                        ui.label(node);
-                    });
-
-                    for j in 0..self.matrix[i].len() {
+            .body(|mut body| {
+                for (i, node) in self.nodes.iter().enumerate() {
+                    body.row(30.0, |mut row| {
                         row.col(|ui| {
-                            // Using a string buffer to edit the integer values
-                            let mut buffer = self.matrix[i][j].to_string();
-                            if ui.text_edit_singleline(&mut buffer).lost_focus() {
-                                if let Ok(updated_value) = buffer.parse::<i32>() {
-                                    self.matrix[i][j] = updated_value;
-                                }
-                            }
+                            ui.label(node);
                         });
-                    }
-                });
-            }
-        });
 
+                        for j in 0..self.matrix_buffer[i].len() {
+                            row.col(|ui| {
+                                ui.text_edit_singleline(&mut self.matrix_buffer[i][j]);
+                            });
+                        }
+                    });
+                }
+            });
     }
 }
