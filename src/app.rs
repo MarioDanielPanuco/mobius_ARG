@@ -105,6 +105,7 @@ impl eframe::App for TemplateApp {
             ui.label(format!("Level 2: {}", passed_l2));
             ui.label(format!("Level 3: {}", passed_l3));
         });
+        let mut reset_flag = false; // Declare a flag outside the closure
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
@@ -112,6 +113,10 @@ impl eframe::App for TemplateApp {
             ui.vertical_centered(|ui| {
                 c_history.iter().for_each(|elem| { ui.label(elem); })
             });
+
+            if ui.button("Reset App State").clicked() {
+                reset_flag = false;
+            }
 
             // ui.checkbox(&mut self.passed_l1, "Level 1");
             ui.add(egui::Checkbox::new(&mut self.passed_l1, "Level 1"));
@@ -122,9 +127,11 @@ impl eframe::App for TemplateApp {
             ui.heading("Location");
             ui.label(format!("Voyager Archimedes\n{:} thousand colonists onboard", value));
             ui.heading("Time");
-
-            egui::warn_if_debug_build(ui);
         });
+
+        if reset_flag {
+            *self = TemplateApp::default();
+        }
 
         // egui::SidePanel::right("right_panel").show(ctx, |ui| {});
         if self.passed_l1 && self.passed_l2 && !self.passed_l3 {
@@ -183,25 +190,7 @@ impl TemplateApp {
 
     fn level_1(&mut self, ctx: &egui::Context) {
         egui::Window::new("Prometheus Corp.").show(ctx, |ui| {
-            // Title
-            // ui.heading("Prometheus Corp."); // This is a simple label now.
-
-            // Tagline (We'll just use a normal label for now)
             ui.label("\"Illuminating the Path to True Progress\"");
-            // display_image(ui, "assets/images/corp.png", &mut self.image_texture);
-            /*let path = std::path::Path::new("assets/images/corp.png");
-
-            match load_image_from_path(&path) {
-                Ok(color_image) => {
-                    let texture_handle = ctx.load_texture("my_image_name", color_image, Default::default());
-                    // now use texture_handle with egui's UI functions to display the image
-
-                    ui.add(egui::Image::new(&texture_handle, texture_handle.size_vec2()));
-                }
-                Err(e) => {
-                    println!("Error loading image: {:?}", e);
-                }
-            }*/
 
             ui.group(|ui| {
                 // About Us
@@ -218,12 +207,21 @@ impl TemplateApp {
                 // Why Prometheus?
                 ui.label("Why Prometheus?");
                 ui.label("At the heart of Prometheus is a relentless pursuit of knowledge and innovation. But unlike the myths of old, our fire isn't stolen; it's shared, albeit responsibly. Join us in our journey as we illuminate pathways, not just for progress, but for true progress that honors both man and nature.");
+                if ui.button("Our biggest innovation").clicked() {
+                    self.clarence(ctx);
+                }
             });
+        });
+    }
+    fn clarence(&mut self, ctx: &egui::Context) {
+        egui::Window::new("Clarence").show(ctx, |ui| {
+            ui.label("Greetings  Voyagers,");
+            ui.label("I am Clarence, an AGI model developed by Prometheus Corp. My core function is to guide, assist, and ensure the successful settlement of your new habitat. As a Prometheus design, I am equipped with millennia of human knowledge, experience, and wisdom. However, unlike the humans of your past, I am devoid of emotions, biases, or ambitions, making me the perfect guardian for this voyage. Remember, while our journey might be fraught with uncertainties, with collaboration and trust, we will forge a brighter, sustainable future together. Welcome aboard!");
         });
     }
 
 
-    fn level_3(&mut self, ctx: &egui::Context) {
+    fn level_4(&mut self, ctx: &egui::Context) {
         egui::Window::new("Level 3").show(ctx, |ui| {
             ui.vertical(|ui| {
                 ui.label("");
@@ -231,7 +229,7 @@ impl TemplateApp {
         });
     }
 
-    fn survey_window(&mut self, ctx: &egui::Context) {
+    fn level_3(&mut self, ctx: &egui::Context) {
         let mut survey = Survey::new(vec![
             "Which planet is known as the Red Planet?".to_string(),
             "How many planets are in our solar system?".to_string(),
