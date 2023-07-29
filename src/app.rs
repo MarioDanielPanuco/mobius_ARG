@@ -1,3 +1,4 @@
+use std::fmt::format;
 use egui::{InnerResponse, Widget};
 use serde::{Deserialize, Serialize};
 use crate::levels::{AppLevel, Level};
@@ -25,9 +26,15 @@ pub struct TemplateApp {
     #[serde(skip)]
     value: usize,
 
+    #[serde(skip)]
+    energy_usage: usize,
+    #[serde(skip)]
+    flow: usize,
+
     passed_l1: bool,
     passed_l2: bool,
     passed_l3: bool,
+    show_clarence: bool,
 
     #[serde(skip)]
     image_texture: Option<egui::TextureHandle>,
@@ -45,6 +52,9 @@ impl Default for TemplateApp {
             supply_chain_demo: SupplyChainDemo::default(),
             label: "Hello World!".to_owned(),
             value: 25,
+            show_clarence: false,
+            energy_usage: 0,
+            flow: 0,
             passed_l1: false,
             passed_l2: false,
             passed_l3: false,
@@ -76,11 +86,13 @@ impl eframe::App for TemplateApp {
     /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let Self {
-            label, value,
+            label,
+            value, energy_usage, flow,
             mut passed_l1, passed_l2, passed_l3,
             lvl_num,
             image_texture,
             supply_chain_demo,
+            show_clarence,
         } = self;
 
         let mut c_history: Vec<String> = vec![]; // TODO: add to app_state
@@ -94,10 +106,16 @@ impl eframe::App for TemplateApp {
 
             if ui.button("Submit").clicked() {
                 c_history.push(label.to_string());
-                if label == "flame" { self.passed_l1=  true; }
+                if label == "flame" { self.passed_l1 = true; }
             }
 
             self.supply_chain_demo.ui(ui);
+
+
+            ui.label(format!("Flow Mass (Tons) {}\nEnergy Usage: {}",
+                             self.flow,
+                             self.energy_usage
+            ));
         });
 
         egui::SidePanel::right("level_completed").show(ctx, |ui| {
@@ -131,9 +149,9 @@ impl eframe::App for TemplateApp {
 
         if reset_flag {
             *self = TemplateApp::default();
+            return;
         }
 
-        // egui::SidePanel::right("right_panel").show(ctx, |ui| {});
         if self.passed_l1 && self.passed_l2 && !self.passed_l3 {
             self.lvl_num = LevelNum::Level3;
         } else if self.passed_l1 && !self.passed_l2 && !self.passed_l3 {
@@ -157,7 +175,7 @@ impl eframe::App for TemplateApp {
 }
 
 impl TemplateApp {
-    fn level_2(&mut self, ctx: &egui::Context) {
+    fn level_1(&mut self, ctx: &egui::Context) {
         egui::Window::new("WELCOME TO THE VOYAGE BEYOND").show(ctx, |ui| {
             // Title
             // ui.heading("WELCOME TO THE VOYAGE BEYOND");
@@ -174,21 +192,20 @@ impl TemplateApp {
                 ui.label("Prometheus Corp, the vanguard of innovation, has been the guiding light of this mission. Their advancements have made this voyage possible, and their AGI model, Clarence, is here to assist in our transition. As we step into our new roles, remember:");
 
                 // Key Philosophies
-                    ui.label("1. Collaboration is Vital: We are pioneers of a new era. By working together, we can overcome the challenges that lie ahead.");
-                    ui.label("2. Trust in Technology: The advanced systems and AGI onboard are designed for our collective well-being. Embrace them as our allies.");
-                    ui.label("3. Build Anew with Respect: As we lay the foundations of a new civilization, let's learn from Earth's past, ensuring our actions are guided by reverence and sustainability.");
+                ui.label("1. Collaboration is Vital: We are pioneers of a new era. By working together, we can overcome the challenges that lie ahead.");
+                ui.label("2. Trust in Technology: The advanced systems and AGI onboard are designed for our collective well-being. Embrace them as our allies.");
+                ui.label("3. Build Anew with Respect: As we lay the foundations of a new civilization, let's learn from Earth's past, ensuring our actions are guided by reverence and sustainability.");
 
                 // Closing Paragraph
                 ui.label("You have been selected not just for your expertise and skills but for the shared vision of a brighter tomorrow. While this mission offers unparalleled challenges, the possibilities for rejuvenation and rebirth are boundless.");
                 ui.label("The ship is now in orientation mode. Once you've gathered your bearings, a detailed briefing will be provided about our current status, our destination, and the initial tasks ahead.");
                 ui.label("Welcome to a new chapter of human history. Together, we shape our destiny.");
             });
-
         });
     }
 
 
-    fn level_1(&mut self, ctx: &egui::Context) {
+    fn level_2(&mut self, ctx: &egui::Context) {
         egui::Window::new("Prometheus Corp.").show(ctx, |ui| {
             ui.label("\"Illuminating the Path to True Progress\"");
 
@@ -208,8 +225,10 @@ impl TemplateApp {
                 ui.label("Why Prometheus?");
                 ui.label("At the heart of Prometheus is a relentless pursuit of knowledge and innovation. But unlike the myths of old, our fire isn't stolen; it's shared, albeit responsibly. Join us in our journey as we illuminate pathways, not just for progress, but for true progress that honors both man and nature.");
                 if ui.button("Our biggest innovation").clicked() {
-                    self.clarence(ctx);
+                    self.show_clarence = true;
                 }
+
+                if self.show_clarence { self.clarence(ctx); }
             });
         });
     }
@@ -217,6 +236,8 @@ impl TemplateApp {
         egui::Window::new("Clarence").show(ctx, |ui| {
             ui.label("Greetings  Voyagers,");
             ui.label("I am Clarence, an AGI model developed by Prometheus Corp. My core function is to guide, assist, and ensure the successful settlement of your new habitat. As a Prometheus design, I am equipped with millennia of human knowledge, experience, and wisdom. However, unlike the humans of your past, I am devoid of emotions, biases, or ambitions, making me the perfect guardian for this voyage. Remember, while our journey might be fraught with uncertainties, with collaboration and trust, we will forge a brighter, sustainable future together. Welcome aboard!");
+
+            if ui.button("Close Page").clicked() { self.show_clarence = false; }
         });
     }
 
@@ -231,20 +252,23 @@ impl TemplateApp {
 
     fn level_3(&mut self, ctx: &egui::Context) {
         let mut survey = Survey::new(vec![
-            "Which planet is known as the Red Planet?".to_string(),
-            "How many planets are in our solar system?".to_string(),
+            "Should Clarence be allowed on the internet?\n(A) - Yes \n(B) - No\n".to_string(),
+            "Should Clarence continue being the sole heir of Prometheus?\n(A) - Yes \n(B) - No\n".to_string(),
             // ... add more questions as needed
         ]);
 
         egui::Window::new("Survey").show(ctx, |ui| {
             survey.show_survey(ui);
 
+            let mut result_bool = false;
             if ui.button("Submit").clicked() {
-                // Calculate the percentage of correct answers
+                result_bool = true;
+            }
+
+            if result_bool {
                 let percentage = calculate_answers(&survey);
                 ui.label(format!("You got {:.2}% correct", percentage));
             }
         });
     }
 }
-

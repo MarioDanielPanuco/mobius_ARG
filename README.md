@@ -1,42 +1,12 @@
-### Testing locally
+### CheatSheet
+- Level 2 code: "flame"
 
-Make sure you are using the latest version of stable rust by running `rustup update`.
+### Narrative 
+Set in 2836 AD, our protagonists find themselves on a distant planet aboard a space vessel carrying 25 thousand colonists, all awakening from cryosleep after a 200-year journey. The voyage had commenced two centuries earlier, during a time when the people of Earth were hopeful about the prospects of unity and collaboration. However, upon awakening, they are confronted with a distressing reality: Earth, despite technological advancements, had become severely divided due to geopolitical conflicts. The consequences of this disunity had dire implications as humanity stopped valuing advancements in power-to-heat dissipation efficiency in effort to accelerate technological progress over rival nations, eventually the Earth's atmospheric temperature surpassed livable conditions due to excess generated heat.
 
-`cargo run --release`
+The colonists' recollections of Earth are spoiled by the toll of unchecked industrialization. It becomes apparent that had the world not been so fractured by geopolitics, humanity might have collectively worked together to develop superconductors or more efficient semiconductor heat dissipation methods, averting the crisis.
 
-On Linux you need to first run:
+Amidst this new reality, the protagonists encounter Clarence, an Artificial General Intelligence model developed by Prometheus Corp. Remarkably, Clarence is the last remaining entity of Prometheus, granting it access to all the ship's systems and data. As the narrative unfolds, the players gradually unravel layers of geopolitics, corporate manipulation, and ethical dilemmas that have shaped the course of human history and led to their current predicament.
 
-`sudo apt-get install libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev libxkbcommon-dev libssl-dev`
+Throughout their journey, the characters are forced to confront questions about the roles of technology and capital in shaping humanity's future. The juxtaposition of Earth's once-united vision of progress with the harsh reality of a divided world prompts profound reflections on the potential consequences of unchecked power, unbridled technological advancement, and the necessity of ethical considerations in the pursuit of progress. Thus, many of the colonists are advocating for a halt on growth and technological progress. 
 
-On Fedora Rawhide you need to run:
-
-`dnf install clang clang-devel clang-tools-extra libxkbcommon-devel pkg-config openssl-devel libxcb-devel gtk3-devel atk fontconfig-devel`
-
-### Web Locally
-
-You can compile your app to [WASM](https://en.wikipedia.org/wiki/WebAssembly) and publish it as a web page.
-
-We use [Trunk](https://trunkrs.dev/) to build for web target.
-1. Install Trunk with `cargo install --locked trunk`.
-2. Run `trunk serve` to build and serve on `http://127.0.0.1:8080`. Trunk will rebuild automatically if you edit the project.
-3. Open `http://127.0.0.1:8080/index.html#dev` in a browser. See the warning below.
-
-> `assets/sw.js` script will try to cache our app, and loads the cached version when it cannot connect to server allowing your app to work offline (like PWA).
-> appending `#dev` to `index.html` will skip this caching, allowing us to load the latest builds during development.
-
-### Web Deploy
-1. Just run `trunk build --release`.
-2. It will generate a `dist` directory as a "static html" website
-3. Upload the `dist` directory to any of the numerous free hosting websites including [GitHub Pages](https://docs.github.com/en/free-pro-team@latest/github/working-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
-4. we already provide a workflow that auto-deploys our app to GitHub pages if you enable it.
-> To enable Github Pages, you need to go to Repository -> Settings -> Pages -> Source -> set to `gh-pages` branch and `/` (root).
->
-> If `gh-pages` is not available in `Source`, just create and push a branch called `gh-pages` and it should be available.
-
-You can test the template app at <https://emilk.github.io/eframe_template/>.
-
-## Updating egui
-
-As of 2023, egui is in active development with frequent releases with breaking changes. [eframe_template](https://github.com/emilk/eframe_template/) will be updated in lock-step to always use the latest version of egui.
-
-When updating `egui` and `eframe` it is recommended you do so one version at the time, and read about the changes in [the egui changelog](https://github.com/emilk/egui/blob/master/CHANGELOG.md) and [eframe changelog](https://github.com/emilk/egui/blob/master/crates/eframe/CHANGELOG.md).
