@@ -19,14 +19,22 @@ impl Default for SupplyChainDemo {
             vec![0, 0, 0, 1],
             vec![0, 0, 0, 0],
         ];
-        let matrix_buffer = matrix.iter().map(|row| {
-            row.iter().map(|&value| value.to_string()).collect::<Vec<_>>()
-        }).collect::<Vec<_>>();
+        let matrix_buffer = matrix
+            .iter()
+            .map(|row| {
+                row.iter()
+                    .map(|&value| value.to_string())
+                    .collect::<Vec<_>>()
+            })
+            .collect::<Vec<_>>();
 
-        SupplyChainDemo { matrix, matrix_buffer, nodes }
+        SupplyChainDemo {
+            matrix,
+            matrix_buffer,
+            nodes,
+        }
     }
 }
-
 
 impl SupplyChainDemo {
     pub fn ui(&mut self, ui: &mut egui::Ui) {
@@ -41,17 +49,18 @@ impl SupplyChainDemo {
             table = table.column(Column::initial(80.0));
         }
 
-        table.header(30.0, |mut header| {
-            header.col(|ui| {
-                ui.strong("Nodes");
-            });
-
-            for node in &self.nodes {
+        table
+            .header(30.0, |mut header| {
                 header.col(|ui| {
-                    ui.strong(node);
+                    ui.strong("Nodes");
                 });
-            }
-        })
+
+                for node in &self.nodes {
+                    header.col(|ui| {
+                        ui.strong(node);
+                    });
+                }
+            })
             .body(|mut body| {
                 for (i, node) in self.nodes.iter().enumerate() {
                     body.row(30.0, |mut row| {

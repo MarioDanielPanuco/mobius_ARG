@@ -1,9 +1,6 @@
-use std::fmt::format;
-use egui::{InnerResponse, Widget};
-use serde::{Deserialize, Serialize};
-use crate::levels::{AppLevel, Level};
 use crate::supply_chain::*;
 use crate::survey::*;
+use serde::{Deserialize, Serialize};
 
 // Define a static array of filepaths
 static FILEPATHS: [&str; 3] = [
@@ -13,7 +10,11 @@ static FILEPATHS: [&str; 3] = [
 ];
 
 #[derive(Serialize, Deserialize, PartialEq)]
-enum LevelNum { Level1, Level2, Level3 }
+enum LevelNum {
+    Level1,
+    Level2,
+    Level3,
+}
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -45,7 +46,6 @@ pub struct TemplateApp {
     supply_chain_demo: SupplyChainDemo,
 }
 
-
 impl Default for TemplateApp {
     fn default() -> Self {
         Self {
@@ -60,7 +60,6 @@ impl Default for TemplateApp {
             passed_l3: false,
             lvl_num: LevelNum::Level1,
             image_texture: None,
-
         }
     }
 }
@@ -87,8 +86,12 @@ impl eframe::App for TemplateApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         let Self {
             label,
-            value, energy_usage, flow,
-            mut passed_l1, passed_l2, passed_l3,
+            value,
+            energy_usage,
+            flow,
+            mut passed_l1,
+            passed_l2,
+            passed_l3,
             lvl_num,
             image_texture,
             supply_chain_demo,
@@ -106,15 +109,16 @@ impl eframe::App for TemplateApp {
 
             if ui.button("Submit").clicked() {
                 c_history.push(label.to_string());
-                if label == "flame" { self.passed_l1 = true; }
+                if label == "flame" {
+                    self.passed_l1 = true;
+                }
             }
 
             self.supply_chain_demo.ui(ui);
 
-
-            ui.label(format!("Flow Mass (Tons) {}\nEnergy Usage: {}",
-                             self.flow,
-                             self.energy_usage
+            ui.label(format!(
+                "Flow Mass (Tons) {}\nEnergy Usage: {}",
+                self.flow, self.energy_usage
             ));
         });
 
@@ -129,7 +133,9 @@ impl eframe::App for TemplateApp {
             // The central panel the region left after adding TopPanel's and SidePanel's
             ui.heading("MOBIUS");
             ui.vertical_centered(|ui| {
-                c_history.iter().for_each(|elem| { ui.label(elem); })
+                c_history.iter().for_each(|elem| {
+                    ui.label(elem);
+                })
             });
 
             if ui.button("Reset App State").clicked() {
@@ -141,9 +147,11 @@ impl eframe::App for TemplateApp {
             ui.add(egui::Checkbox::new(&mut self.passed_l2, "Level 2"));
             ui.add(egui::Checkbox::new(&mut self.passed_l3, "Level 3"));
 
-
             ui.heading("Location");
-            ui.label(format!("Voyager Archimedes\n{:} thousand colonists onboard", value));
+            ui.label(format!(
+                "Voyager Archimedes\n{:} thousand colonists onboard",
+                value
+            ));
             ui.heading("Time");
         });
 
@@ -158,7 +166,8 @@ impl eframe::App for TemplateApp {
             self.lvl_num = LevelNum::Level2;
         } else if !self.passed_l1 && !self.passed_l2 && !self.passed_l3 {
             self.lvl_num = LevelNum::Level1;
-        } else {}
+        } else {
+        }
 
         // Matching Level Windows
         match self.lvl_num {
@@ -183,7 +192,7 @@ impl TemplateApp {
             // Introductory Paragraph
             ui.group(|ui| {
                 ui.label("Good day, Voyager.");
-                ui.label("It is the year 2486 AD. You have successfully emerged from cryosleep aboard the Colony Transport Vessel 'Aurora Beacon'. As we journey to our new habitat, we carry with us the legacies, dreams, and hopes of an Earth that once was.");
+                ui.label("It is the year 2836 AD. You have successfully emerged from cryosleep aboard the Colony Transport Vessel 'Aurora Beacon'. As we journey to our new habitat, we carry with us the legacies, dreams, and hopes of an Earth that once was.");
 
                 // Background History
                 ui.label("When you left Earth, our home was grappling with the consequences of centuries of environmental and societal shifts. Much had been sacrificed, and even more had been lost. However, from the embers of that turmoil, humanity found the strength to embark on this audacious journey.");
@@ -203,7 +212,6 @@ impl TemplateApp {
             });
         });
     }
-
 
     fn level_2(&mut self, ctx: &egui::Context) {
         egui::Window::new("Prometheus Corp.").show(ctx, |ui| {
@@ -241,7 +249,6 @@ impl TemplateApp {
         });
     }
 
-
     fn level_4(&mut self, ctx: &egui::Context) {
         egui::Window::new("Level 3").show(ctx, |ui| {
             ui.vertical(|ui| {
@@ -253,7 +260,8 @@ impl TemplateApp {
     fn level_3(&mut self, ctx: &egui::Context) {
         let mut survey = Survey::new(vec![
             "Should Clarence be allowed on the internet?\n(A) - Yes \n(B) - No\n".to_string(),
-            "Should Clarence continue being the sole heir of Prometheus?\n(A) - Yes \n(B) - No\n".to_string(),
+            "Should Clarence continue being the sole heir of Prometheus?\n(A) - Yes \n(B) - No\n"
+                .to_string(),
             // ... add more questions as needed
         ]);
 

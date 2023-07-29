@@ -1,5 +1,6 @@
-
-pub fn test(val: &mut i32) { *val += 1; }
+pub fn test(val: &mut i32) {
+    *val += 1;
+}
 
 pub trait AppLevel {
     fn new(name: &'static str, context: &'static str, health: &mut usize) -> Self;
@@ -10,9 +11,7 @@ pub trait AppLevel {
 
     fn show(&mut self, ctx: &egui::Context) {
         egui::Window::new(self.name()).show(ctx, |ui| {
-            ui.vertical(|ui| {
-                ui.label(self.context())
-            });
+            ui.vertical(|ui| ui.label(self.context()));
             let mut val = 1;
             test(&mut val);
             ui.label(val.to_string());
@@ -39,7 +38,13 @@ impl AppLevel for Level {
         }
     }
 
-    fn name(&self) -> &'static str { self.name }
-    fn context(&self) -> &'static str { self.context }
-    fn user_health(&self) -> usize { self.user_health }
+    fn name(&self) -> &'static str {
+        self.name
+    }
+    fn context(&self) -> &'static str {
+        self.context
+    }
+    fn user_health(&self) -> usize {
+        self.user_health
+    }
 }

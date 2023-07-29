@@ -1,8 +1,13 @@
 use egui::*;
 use std::collections::HashMap;
 
-static CORRECT_ANSWERS: [AnswerOption; 5] =
-    [AnswerOption::C, AnswerOption::B, AnswerOption::A, AnswerOption::C, AnswerOption::A];
+static CORRECT_ANSWERS: [AnswerOption; 5] = [
+    AnswerOption::C,
+    AnswerOption::B,
+    AnswerOption::A,
+    AnswerOption::C,
+    AnswerOption::A,
+];
 
 // The `AnswerOption` and `Survey` structs have already been defined, so we don't need to redefine them.
 #[derive(PartialEq, Debug, Clone)]
@@ -12,27 +17,28 @@ pub enum AnswerOption {
 
 pub struct Survey {
     questions: Vec<String>,
-    answers: HashMap<usize, AnswerOption>,
+    answers: Vec<AnswerOption>,
 }
 
 impl Survey {
     pub fn new(questions: Vec<String>) -> Self {
-        Survey { questions, answers: HashMap::new()}
+        let len = questions.len();
+        Survey {
+            questions,
+            answers: vec![AnswerOption::A; len],
+        }
     }
 }
 
-
 pub fn calculate_answers(survey: &Survey) -> f32 {
     let min_len = std::cmp::min(survey.answers.len(), CORRECT_ANSWERS.len());
-    let mut count = 0;
-
-    for i in 0..min_len {
-        if let Some(answer) = survey.answers.get(&i) {
-            if *answer == CORRECT_ANSWERS[i] {
-                count += 1;
-            }
-        }
-    }
+    let count = survey
+        .answers
+        .iter()
+        .zip(CORRECT_ANSWERS.iter())
+        .take(min_len)
+        .filter(|(a, b)| a == b)
+        .count();
 
     count as f32 / survey.answers.len() as f32 * 100.0
 }
@@ -44,18 +50,15 @@ impl Survey {
             ui.group(|ui| {
                 ui.label(question);
 
-                // Here, we can use radio buttons for the answer options.
-                let mut selected_option = self.answers.get(&index).cloned().unwrap_or(AnswerOption::A);
+                // Get a mutable reference to the selected option
+                let selected_option = &mut self.answers[index];
 
                 ui.horizontal(|ui| {
-                    ui.radio_value(&mut selected_option, AnswerOption::A, "A");
-                    ui.radio_value(&mut selected_option, AnswerOption::B, "B");
-                    ui.radio_value(&mut selected_option, AnswerOption::C, "C");
-                    ui.radio_value(&mut selected_option, AnswerOption::D, "D");
+                    ui.radio_value(selected_option, AnswerOption::A, "A");
+                    ui.radio_value(selected_option, AnswerOption::B, "B");
+                    ui.radio_value(selected_option, AnswerOption::C, "C");
+                    ui.radio_value(selected_option, AnswerOption::D, "D");
                 });
-
-                // Update the selected option
-                self.answers.insert(index, selected_option);
             });
         }
     }
