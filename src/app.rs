@@ -36,12 +36,12 @@ pub struct TemplateApp {
     passed_l2: bool,
     passed_l3: bool,
     show_clarence: bool,
+    show_results: bool,
 
     #[serde(skip)]
     image_texture: Option<egui::TextureHandle>,
 
     lvl_num: LevelNum,
-
     #[serde(skip)]
     supply_chain_demo: SupplyChainDemo,
 }
@@ -60,6 +60,7 @@ impl Default for TemplateApp {
             passed_l3: false,
             lvl_num: LevelNum::Level1,
             image_texture: None,
+            show_results: false,
         }
     }
 }
@@ -90,12 +91,11 @@ impl eframe::App for TemplateApp {
             energy_usage,
             flow,
             mut passed_l1,
-            passed_l2,
-            passed_l3,
+            passed_l2, passed_l3,
             lvl_num,
             image_texture,
             supply_chain_demo,
-            show_clarence,
+            show_clarence, show_results
         } = self;
 
         let mut c_history: Vec<String> = vec![]; // TODO: add to app_state
@@ -168,6 +168,7 @@ impl eframe::App for TemplateApp {
             self.lvl_num = LevelNum::Level1;
         } else {
         }
+        self.introduction(ctx);
 
         // Matching Level Windows
         match self.lvl_num {
@@ -185,6 +186,64 @@ impl eframe::App for TemplateApp {
 
 impl TemplateApp {
     fn level_1(&mut self, ctx: &egui::Context) {
+        egui::Window::new("The Deceleration Renaissance").show(ctx, |ui| {
+            // Heading
+            ui.group(|ui| {
+                ui.horizontal(|ui| {
+                    ui.monospace("### ");
+                    let text_color = egui::Color32::WHITE;
+                    ui.colored_label(text_color, "The Deceleration Renaissance");
+                });
+            });
+
+            // Subtitle
+            ui.group(|ui| {
+                ui.horizontal(|ui| {
+                    ui.monospace("*");
+                    let text_color = egui::Color32::from_gray(180);  // A softer color to resemble markdown's italicized rendering
+                    ui.colored_label(text_color, "\"Reclaiming Balance, Reviving Earth\"");
+                    ui.monospace("*");
+                });
+            });
+
+            // Who We Are:
+            ui.group(|ui| {
+                ui.horizontal(|ui| {
+                    ui.heading("Who We Are:");
+                });
+                ui.label("The De-growth Renaissance is a global collective striving for a harmonious balance between human existence and the Earth's ecosystems. We believe in a sustainable, prosperous future where human intervention is considerate, deliberate, and nurturing.");
+            });
+
+            // Our Vision:
+            ui.group(|ui| {
+                ui.horizontal(|ui| {
+                    ui.heading("Our Vision:");
+                });
+                ui.label("As we stand at the crossroads of history, witnessing the decline of our once magnificent home, we advocate for an introspective pause. It's time to re-evaluate our trajectory, reassess our priorities, and return to a way of life that respects, rather than exploits, the planet.");
+            });
+
+            // Guiding Principles:
+            ui.group(|ui| {
+                ui.horizontal(|ui| {
+                    ui.heading("Guiding Principles:");
+                });
+                ui.label("1. **Reverence for Earth:** Recognizing our planet as a living entity and treating its resources with utmost respect.");
+                ui.label("2. **Holistic Prosperity:** Wealth is not just monetary. True prosperity encompasses clean air, pristine waters, fertile lands, and the shared joy of community.");
+                ui.label("3. **Intentional Progress:** We champion responsible advancements that align with Earth's rhythm, rejecting mindless consumption and unchecked growth.");
+            });
+
+            // Join the Movement:
+            ui.group(|ui| {
+                ui.horizontal(|ui| {
+                    ui.heading("Join the Movement:");
+                });
+                ui.label("Together, we can rewrite our narrative, moving from exploitation to co-existence. Dive deep, reflect, and let's embark on this transformative journey towards de-growth.");
+            });
+        });
+    }
+
+
+    fn introduction(&mut self, ctx: &egui::Context) {
         egui::Window::new("WELCOME TO THE VOYAGE BEYOND").show(ctx, |ui| {
             // Title
             // ui.heading("WELCOME TO THE VOYAGE BEYOND");
@@ -268,12 +327,11 @@ impl TemplateApp {
         egui::Window::new("Survey").show(ctx, |ui| {
             survey.show_survey(ui);
 
-            let mut result_bool = false;
             if ui.button("Submit").clicked() {
-                result_bool = true;
+                self.show_results = true;
             }
 
-            if result_bool {
+            if self.show_results {
                 let percentage = calculate_answers(&survey);
                 ui.label(format!("You got {:.2}% correct", percentage));
             }
