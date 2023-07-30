@@ -2,8 +2,8 @@ pub struct SupplyChainDemo {
     matrix: Vec<Vec<Option<f32>>>,
     matrix_buffer: Vec<Vec<String>>,
     nodes: Vec<String>,
-    energy: i32,
-    flow: i32,
+    pub(crate) energy: i32,
+    pub(crate) flow: i32,
 }
 
 impl Default for SupplyChainDemo {
@@ -44,10 +44,46 @@ impl Default for SupplyChainDemo {
 
 impl SupplyChainDemo {
 
-    // pub fn calc_flow_energy(&mut self, ui: &mut egui::Ui) -> (i32, i32) {
-    //     ui.add(egui::Slider::new(&mut self.energy, 0.0..=100.0).text("My value"));
-    //
-    // }
+    pub fn calc_flow_energy(&mut self, ui: &mut egui::Ui) {
+        // Let's create sliders for augmentation values of matrix entries.
+        let mut augmentation_matrix: Vec<Vec<f32>> = vec![vec![1.0; self.matrix[0].len()]; self.nodes.len()];
+        for i in 0..self.nodes.len() {
+            for j in 0..self.matrix[0].len() {
+                let mut value = augmentation_matrix[i][j];
+                let label = format!("Augmentation for [{}][{}]", i, j);
+                ui.add(egui::Slider::new(&mut value, 1.0..=10.0).text(label));
+                augmentation_matrix[i][j] = value;
+            }
+        }
+
+        // Calculate energy and flow based on the matrix and its augmentations.
+        let mut total_energy = 0.0;
+        let mut total_flow = 0.0;
+        for i in 0..self.nodes.len() {
+            for j in 0..self.matrix[0].len() {
+                if let Some(value) = self.matrix[i][j] {
+                    total_energy += value * augmentation_matrix[i][j];
+                }
+            }
+        }
+
+        // Assuming flow is the sum of the maximum augmented value in each column.
+        for j in 0..self.matrix[0].len() {
+            let mut max_val = 0.0;
+            for i in 0..self.nodes.len() {
+                if let Some(value) = self.matrix[i][j] {
+                    max_val = max_val.max((value * augmentation_matrix[i][j]) as f64);
+                }
+            }
+            total_flow += max_val;
+        }
+
+        // Convert them to i32 for setting them to struct fields.
+        self.energy = total_energy as i32;
+        self.flow = total_flow as i32;
+    }
+
+    // ... Rest of the code remains unchanged.
     pub fn ui(&mut self, ui: &mut egui::Ui) {
         use egui_extras::{Column, TableBuilder};
 
