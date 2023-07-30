@@ -53,7 +53,9 @@ impl SupplyChainDemo {
             for j in 0..self.matrix[0].len() {
                 let mut value = self.augmentation_matrix[i][j];
                 let label = format!("Augmentation for [{}][{}]", i, j);
-                ui.add(egui::Slider::new(&mut value, 1.0..=10.0).text(label));
+                if self.matrix[i][j].unwrap() != 0.0 {
+                    ui.add(egui::Slider::new(&mut value, 1.0..=10.0).text(label));
+                }
                 self.augmentation_matrix[i][j] = value;
             }
         }
