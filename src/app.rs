@@ -2,13 +2,6 @@ use crate::supply_chain::*;
 use crate::survey::*;
 use serde::{Deserialize, Serialize};
 
-// Define a static array of filepaths
-static FILEPATHS: [&str; 3] = [
-    "/assets/text/level_1.md",
-    "/assets/text/level_2.md",
-    "/assets/text/level_3.md",
-];
-
 #[derive(Serialize, Deserialize, PartialEq)]
 enum LevelNum {
     Level1,
@@ -32,6 +25,7 @@ pub struct TemplateApp {
     #[serde(skip)]
     flow: usize,
 
+    restart_flag: bool,
     passed_l1: bool,
     passed_l2: bool,
     passed_l3: bool,
@@ -64,11 +58,13 @@ impl Default for TemplateApp {
             lvl_num: LevelNum::Level1,
             image_texture: None,
             show_results: false,
+            restart_flag: false,
             survey: Survey::new(vec![
             "Should Clarence be allowed on the internet?\n(A) - Yes \n(B) - No\n".to_string(),
             "Should Clarence continue being the sole heir of Prometheus?\n(A) - Yes \n(B) - No\n".to_string(),
             "Should we place limits on humanities energy consumption?\n(A) - Yes\n(B) - No".to_string(),
             "Should AI automate our supply chains and ?\n(A) - Yes\n(B) - No".to_string(),
+            "Should AI be allowed to design and train next iterations of itself?\n(A) - Yes\n(B) - No".to_string(),
             // ... add more questions as needed
         ]),
         }
@@ -101,7 +97,7 @@ impl eframe::App for TemplateApp {
             energy_usage,
             flow,
             mut passed_l1,
-            passed_l2, passed_l3,
+            passed_l2, passed_l3, restart_flag,
             lvl_num,
             image_texture,
             supply_chain_demo,
@@ -138,7 +134,6 @@ impl eframe::App for TemplateApp {
             ui.label(format!("Level 2: {}", passed_l2));
             ui.label(format!("Level 3: {}", passed_l3));
         });
-        let mut reset_flag = false; // Declare a flag outside the closure
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
@@ -150,7 +145,7 @@ impl eframe::App for TemplateApp {
             });
 
             if ui.button("Reset App State").clicked() {
-                reset_flag = false;
+                self.restart_flag = false;
             }
 
             // ui.checkbox(&mut self.passed_l1, "Level 1");
@@ -164,9 +159,34 @@ impl eframe::App for TemplateApp {
                 value
             ));
             ui.heading("Time");
+
+
+            ui.heading("WELCOME TO THE VOYAGE BEYOND");
+
+            // Introductory Paragraph
+            ui.group(|ui| {
+                ui.label("Good day, Voyager.");
+                ui.label("It is the year 2836 AD. You have successfully emerged from cryosleep aboard the Colony Transport Vessel 'Aurora Beacon'. As we journey to our new habitat, we carry with us the legacies, dreams, and hopes of an Earth that once was.");
+
+                // Background History
+                ui.label("When you left Earth, our home was grappling with the consequences of centuries of environmental and societal shifts. Much had been sacrificed, and even more had been lost. However, from the embers of that turmoil, humanity found the strength to embark on this audacious journey.");
+
+                // Prometheus Corp's Role
+                ui.label("Prometheus Corp, the vanguard of innovation, has been the guiding light of this mission. Their advancements have made this voyage possible, and their AGI model, Clarence, is here to assist in our transition. As we step into our new roles, remember:");
+
+                // Key Philosophies
+                ui.label("1. Collaboration is Vital: We are pioneers of a new era. By working together, we can overcome the challenges that lie ahead.");
+                ui.label("2. Trust in Technology: The advanced systems and AGI onboard are designed for our collective well-being. Embrace them as our allies.");
+                ui.label("3. Build Anew with Respect: As we lay the foundations of a new civilization, let's learn from Earth's past, ensuring our actions are guided by reverence and sustainability.");
+
+                // Closing Paragraph
+                ui.label("You have been selected not just for your expertise and skills but for the shared vision of a brighter tomorrow. While this mission offers unparalleled challenges, the possibilities for rejuvenation and rebirth are boundless.");
+                ui.label("The ship is now in orientation mode. Once you've gathered your bearings, a detailed briefing will be provided about our current status, our destination, and the initial tasks ahead.");
+                ui.label("Welcome to a new chapter of human history. Together, we shape our destiny.");
+            });
         });
 
-        if reset_flag {
+        if self.restart_flag {
             *self = TemplateApp::default();
             return;
         }
@@ -179,7 +199,6 @@ impl eframe::App for TemplateApp {
             self.lvl_num = LevelNum::Level1;
         } else {
         }
-        self.introduction(ctx);
 
         // Matching Level Windows
         match self.lvl_num {
@@ -236,35 +255,6 @@ impl TemplateApp {
                     ui.heading("Join the Movement:");
                 });
                 ui.label("Together, we can rewrite our narrative, moving from exploitation to co-existence. Dive deep, reflect, and let's embark on this transformative journey towards de-growth.");
-            });
-        });
-    }
-
-    fn introduction(&mut self, ctx: &egui::Context) {
-        egui::Window::new("WELCOME TO THE VOYAGE BEYOND").show(ctx, |ui| {
-            // Title
-            // ui.heading("WELCOME TO THE VOYAGE BEYOND");
-
-            // Introductory Paragraph
-            ui.group(|ui| {
-                ui.label("Good day, Voyager.");
-                ui.label("It is the year 2836 AD. You have successfully emerged from cryosleep aboard the Colony Transport Vessel 'Aurora Beacon'. As we journey to our new habitat, we carry with us the legacies, dreams, and hopes of an Earth that once was.");
-
-                // Background History
-                ui.label("When you left Earth, our home was grappling with the consequences of centuries of environmental and societal shifts. Much had been sacrificed, and even more had been lost. However, from the embers of that turmoil, humanity found the strength to embark on this audacious journey.");
-
-                // Prometheus Corp's Role
-                ui.label("Prometheus Corp, the vanguard of innovation, has been the guiding light of this mission. Their advancements have made this voyage possible, and their AGI model, Clarence, is here to assist in our transition. As we step into our new roles, remember:");
-
-                // Key Philosophies
-                ui.label("1. Collaboration is Vital: We are pioneers of a new era. By working together, we can overcome the challenges that lie ahead.");
-                ui.label("2. Trust in Technology: The advanced systems and AGI onboard are designed for our collective well-being. Embrace them as our allies.");
-                ui.label("3. Build Anew with Respect: As we lay the foundations of a new civilization, let's learn from Earth's past, ensuring our actions are guided by reverence and sustainability.");
-
-                // Closing Paragraph
-                ui.label("You have been selected not just for your expertise and skills but for the shared vision of a brighter tomorrow. While this mission offers unparalleled challenges, the possibilities for rejuvenation and rebirth are boundless.");
-                ui.label("The ship is now in orientation mode. Once you've gathered your bearings, a detailed briefing will be provided about our current status, our destination, and the initial tasks ahead.");
-                ui.label("Welcome to a new chapter of human history. Together, we shape our destiny.");
             });
         });
     }

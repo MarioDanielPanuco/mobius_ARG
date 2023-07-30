@@ -8,7 +8,7 @@ fn main() -> eframe::Result<()> {
 
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(
-        "eframe template",
+        "Mobius",
         native_options,
         Box::new(|cc| Box::new(morbius_arg::TemplateApp::new(cc))),
     )
