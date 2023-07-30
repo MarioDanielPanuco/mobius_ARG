@@ -16,9 +16,9 @@ impl Default for SupplyChainDemo {
             "Retailer".to_string(),
         ];
         let matrix = vec![
-            vec![None, Some(1.0), None, None],
+            vec![None, Some(1.0), Some(0.5), None],
             vec![None, None, Some(1.0), None],
-            vec![None, None, None, Some(1.0)],
+            vec![None, Some(0.8), None, Some(1.0)],
             vec![None, None, None, None],
         ];
         let matrix_buffer = matrix
@@ -87,7 +87,11 @@ impl SupplyChainDemo {
 
 
         // Convert them to i32 for setting them to struct fields.
-        self.energy = total_energy as i32;
+        if total_energy >= 25.0 {
+            self.energy = -1;
+        } else {
+            self.energy = total_energy as i32;
+        }
         self.flow = total_flow as i32;
     }
 

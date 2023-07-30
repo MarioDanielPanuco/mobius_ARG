@@ -1,6 +1,8 @@
 ### CheatSheet
 - Level 2 code: "flame"
-
+- The mechanics of the supply chain game are wonky; the slider widgets are 0 indexed from the table. ex [0][1] changes energy/flow but [0][0] doesn't.
+- There's a limit of 25 megawatts energy consumption
+ 
 ### Narrative 
 Set in 2836 AD, our protagonists find themselves on a distant planet aboard a space vessel carrying 25 thousand colonists, all awakening from cryosleep after a 200-year journey. The voyage had commenced two centuries earlier, during a time when the people of Earth were hopeful about the prospects of unity and collaboration. However, upon awakening, they are confronted with a distressing reality: Earth, despite technological advancements, had become severely divided due to geopolitical conflicts. The consequences of this disunity had dire implications as humanity stopped valuing advancements in power-to-heat dissipation efficiency in effort to accelerate technological progress over rival nations, eventually the Earth's atmospheric temperature surpassed livable conditions due to excess generated heat.
 
