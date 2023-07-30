@@ -4,6 +4,7 @@ pub struct SupplyChainDemo {
     nodes: Vec<String>,
     pub(crate) energy: i32,
     pub(crate) flow: i32,
+    augmentation_matrix: Vec<Vec<f32>>,
 }
 
 impl Default for SupplyChainDemo {
@@ -31,13 +32,15 @@ impl Default for SupplyChainDemo {
                     .collect::<Vec<_>>()
             })
             .collect::<Vec<_>>();
-
+        let n = nodes.len();
+        let n_1 = matrix[0].len();
         SupplyChainDemo {
             matrix,
             matrix_buffer,
             nodes,
             energy: 0,
             flow: 0,
+            augmentation_matrix: vec![vec![1.0; n_1]; n],
         }
     }
 }
@@ -46,13 +49,12 @@ impl SupplyChainDemo {
 
     pub fn calc_flow_energy(&mut self, ui: &mut egui::Ui) {
         // Let's create sliders for augmentation values of matrix entries.
-        let mut augmentation_matrix: Vec<Vec<f32>> = vec![vec![1.0; self.matrix[0].len()]; self.nodes.len()];
         for i in 0..self.nodes.len() {
             for j in 0..self.matrix[0].len() {
-                let mut value = augmentation_matrix[i][j];
+                let mut value = self.augmentation_matrix[i][j];
                 let label = format!("Augmentation for [{}][{}]", i, j);
                 ui.add(egui::Slider::new(&mut value, 1.0..=10.0).text(label));
-                augmentation_matrix[i][j] = value;
+                self.augmentation_matrix[i][j] = value;
             }
         }
 
@@ -62,7 +64,7 @@ impl SupplyChainDemo {
         for i in 0..self.nodes.len() {
             for j in 0..self.matrix[0].len() {
                 if let Some(value) = self.matrix[i][j] {
-                    total_energy += value * augmentation_matrix[i][j];
+                    total_energy += value * self.augmentation_matrix[i][j];
                 }
             }
         }
@@ -72,7 +74,7 @@ impl SupplyChainDemo {
             let mut max_val = 0.0;
             for i in 0..self.nodes.len() {
                 if let Some(value) = self.matrix[i][j] {
-                    let augmented_value = value * augmentation_matrix[i][j];
+                    let augmented_value = value * self.augmentation_matrix[i][j];
                     if augmented_value > max_val {
                         max_val = augmented_value;
                     }
