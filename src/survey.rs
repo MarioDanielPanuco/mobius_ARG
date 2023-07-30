@@ -1,5 +1,6 @@
 use egui::*;
 use std::collections::HashMap;
+use log::set_max_level;
 
 static CORRECT_ANSWERS: [AnswerOption; 5] = [
     AnswerOption::C,
@@ -50,15 +51,14 @@ impl Survey {
             ui.group(|ui| {
                 ui.label(question);
 
-                // Get a mutable reference to the selected option
-                let selected_option = &mut self.answers[index];
-
-                ui.horizontal(|ui| {
-                    ui.radio_value(selected_option, AnswerOption::A, "A");
-                    ui.radio_value(selected_option, AnswerOption::B, "B");
-                    ui.radio_value(selected_option, AnswerOption::C, "C");
-                    ui.radio_value(selected_option, AnswerOption::D, "D");
-                });
+                if let Some(selected_option) = self.answers.get_mut(index) {
+                    ui.horizontal(|ui| {
+                        ui.radio_value(selected_option, AnswerOption::A, "A");
+                        ui.radio_value(selected_option, AnswerOption::B, "B");
+                        ui.radio_value(selected_option, AnswerOption::C, "C");
+                        ui.radio_value(selected_option, AnswerOption::D, "D");
+                    });
+                }
             });
         }
     }

@@ -44,6 +44,9 @@ pub struct TemplateApp {
     lvl_num: LevelNum,
     #[serde(skip)]
     supply_chain_demo: SupplyChainDemo,
+
+    #[serde(skip)]
+    survey: Survey,
 }
 
 impl Default for TemplateApp {
@@ -61,6 +64,13 @@ impl Default for TemplateApp {
             lvl_num: LevelNum::Level1,
             image_texture: None,
             show_results: false,
+            survey: Survey::new(vec![
+            "Should Clarence be allowed on the internet?\n(A) - Yes \n(B) - No\n".to_string(),
+            "Should Clarence continue being the sole heir of Prometheus?\n(A) - Yes \n(B) - No\n".to_string(),
+            "Should we place limits on humanities energy consumption?\n(A) - Yes\n(B) - No".to_string(),
+            "Should AI automate our supply chains and ?\n(A) - Yes\n(B) - No".to_string(),
+            // ... add more questions as needed
+        ]),
         }
     }
 }
@@ -95,7 +105,8 @@ impl eframe::App for TemplateApp {
             lvl_num,
             image_texture,
             supply_chain_demo,
-            show_clarence, show_results
+            show_clarence, show_results,
+            survey,
         } = self;
 
         let mut c_history: Vec<String> = vec![]; // TODO: add to app_state
@@ -188,23 +199,10 @@ impl TemplateApp {
     fn level_1(&mut self, ctx: &egui::Context) {
         egui::Window::new("The Deceleration Renaissance").show(ctx, |ui| {
             // Heading
-            ui.group(|ui| {
-                ui.horizontal(|ui| {
-                    ui.monospace("### ");
-                    let text_color = egui::Color32::WHITE;
-                    ui.colored_label(text_color, "The Deceleration Renaissance");
-                });
-            });
+            ui.heading("The Deceleration Renaissance");
 
             // Subtitle
-            ui.group(|ui| {
-                ui.horizontal(|ui| {
-                    ui.monospace("*");
-                    let text_color = egui::Color32::from_gray(180);  // A softer color to resemble markdown's italicized rendering
-                    ui.colored_label(text_color, "\"Reclaiming Balance, Reviving Earth\"");
-                    ui.monospace("*");
-                });
-            });
+            ui.heading("\"Reclaiming Balance, Reviving Earth\"");
 
             // Who We Are:
             ui.group(|ui| {
@@ -241,7 +239,6 @@ impl TemplateApp {
             });
         });
     }
-
 
     fn introduction(&mut self, ctx: &egui::Context) {
         egui::Window::new("WELCOME TO THE VOYAGE BEYOND").show(ctx, |ui| {
@@ -317,22 +314,15 @@ impl TemplateApp {
     }
 
     fn level_3(&mut self, ctx: &egui::Context) {
-        let mut survey = Survey::new(vec![
-            "Should Clarence be allowed on the internet?\n(A) - Yes \n(B) - No\n".to_string(),
-            "Should Clarence continue being the sole heir of Prometheus?\n(A) - Yes \n(B) - No\n"
-                .to_string(),
-            // ... add more questions as needed
-        ]);
-
         egui::Window::new("Survey").show(ctx, |ui| {
-            survey.show_survey(ui);
+            self.survey.show_survey(ui);
 
             if ui.button("Submit").clicked() {
                 self.show_results = true;
             }
 
             if self.show_results {
-                let percentage = calculate_answers(&survey);
+                let percentage = calculate_answers(&self.survey);
                 ui.label(format!("You got {:.2}% correct", percentage));
             }
         });
