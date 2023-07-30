@@ -7,6 +7,7 @@ enum LevelNum {
     Level1,
     Level2,
     Level3,
+    Level4,
 }
 
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
@@ -29,6 +30,7 @@ pub struct TemplateApp {
     passed_l1: bool,
     passed_l2: bool,
     passed_l3: bool,
+    passed_l4: bool,
     show_clarence: bool,
     show_results: bool,
 
@@ -55,6 +57,7 @@ impl Default for TemplateApp {
             passed_l1: false,
             passed_l2: false,
             passed_l3: false,
+            passed_l4: false,
             lvl_num: LevelNum::Level1,
             image_texture: None,
             show_results: false,
@@ -98,7 +101,7 @@ impl eframe::App for TemplateApp {
             flow,
             mut passed_l1,
             passed_l2, passed_l3, restart_flag,
-            lvl_num,
+            lvl_num, passed_l4,
             image_texture,
             supply_chain_demo,
             show_clarence, show_results,
@@ -123,9 +126,10 @@ impl eframe::App for TemplateApp {
 
             self.supply_chain_demo.ui(ui);
 
+            self.supply_chain_demo.calc_flow_energy(ui);
             ui.label(format!(
                 "Flow Mass (Tons) {}\nEnergy Usage: {}",
-                self.flow, self.energy_usage
+                self.supply_chain_demo.flow, self.supply_chain_demo.energy
             ));
         });
 
@@ -133,6 +137,7 @@ impl eframe::App for TemplateApp {
             ui.label(format!("Level 1: {}", passed_l1));
             ui.label(format!("Level 2: {}", passed_l2));
             ui.label(format!("Level 3: {}", passed_l3));
+            ui.label(format!("Level 4: {}", passed_l4));
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
@@ -145,7 +150,7 @@ impl eframe::App for TemplateApp {
             });
 
             if ui.button("Reset App State").clicked() {
-                self.restart_flag = false;
+                self.restart_flag = !self.restart_flag;
             }
 
             // ui.checkbox(&mut self.passed_l1, "Level 1");
@@ -197,14 +202,16 @@ impl eframe::App for TemplateApp {
             self.lvl_num = LevelNum::Level2;
         } else if !self.passed_l1 && !self.passed_l2 && !self.passed_l3 {
             self.lvl_num = LevelNum::Level1;
-        } else {
-        }
+        } else if self.passed_l1 && self.passed_l2 && self.passed_l3 && self.passed_l4 {
+            self.lvl_num = LevelNum::Level4;
+        } else { }
 
         // Matching Level Windows
         match self.lvl_num {
             LevelNum::Level1 => self.level_1(ctx),
             LevelNum::Level2 => self.level_2(ctx),
-            LevelNum::Level3 => self.level_3(ctx),
+            LevelNum::Level3 => self.clarence(ctx),
+            LevelNum::Level4 => self.level_4(ctx),
         }
     }
 
@@ -215,7 +222,7 @@ impl eframe::App for TemplateApp {
 }
 
 impl TemplateApp {
-    fn level_1(&mut self, ctx: &egui::Context) {
+    fn level_2(&mut self, ctx: &egui::Context) {
         egui::Window::new("The Deceleration Renaissance").show(ctx, |ui| {
             // Heading
             ui.heading("The Deceleration Renaissance");
@@ -259,7 +266,7 @@ impl TemplateApp {
         });
     }
 
-    fn level_2(&mut self, ctx: &egui::Context) {
+    fn level_1(&mut self, ctx: &egui::Context) {
         egui::Window::new("Prometheus Corp.").show(ctx, |ui| {
             ui.label("\"Illuminating the Path to True Progress\"");
 
@@ -286,6 +293,7 @@ impl TemplateApp {
             });
         });
     }
+
     fn clarence(&mut self, ctx: &egui::Context) {
         egui::Window::new("Clarence").show(ctx, |ui| {
             ui.label("Greetings  Voyagers,");
@@ -295,7 +303,7 @@ impl TemplateApp {
         });
     }
 
-    fn level_4(&mut self, ctx: &egui::Context) {
+    fn level_3(&mut self, ctx: &egui::Context) {
         egui::Window::new("Level 3").show(ctx, |ui| {
             ui.vertical(|ui| {
                 ui.label("");
@@ -303,7 +311,7 @@ impl TemplateApp {
         });
     }
 
-    fn level_3(&mut self, ctx: &egui::Context) {
+    fn level_4(&mut self, ctx: &egui::Context) {
         egui::Window::new("Survey").show(ctx, |ui| {
             self.survey.show_survey(ui);
 

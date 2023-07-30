@@ -72,11 +72,15 @@ impl SupplyChainDemo {
             let mut max_val = 0.0;
             for i in 0..self.nodes.len() {
                 if let Some(value) = self.matrix[i][j] {
-                    max_val = max_val.max((value * augmentation_matrix[i][j]) as f64);
+                    let augmented_value = value * augmentation_matrix[i][j];
+                    if augmented_value > max_val {
+                        max_val = augmented_value;
+                    }
                 }
             }
             total_flow += max_val;
         }
+
 
         // Convert them to i32 for setting them to struct fields.
         self.energy = total_energy as i32;
