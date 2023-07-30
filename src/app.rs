@@ -202,7 +202,7 @@ impl eframe::App for TemplateApp {
             self.lvl_num = LevelNum::Level2;
         } else if !self.passed_l1 && !self.passed_l2 && !self.passed_l3 {
             self.lvl_num = LevelNum::Level1;
-        } else if self.passed_l1 && self.passed_l2 && self.passed_l3 && self.passed_l4 {
+        } else if self.passed_l1 && self.passed_l2 && self.passed_l3 && !self.passed_l4 {
             self.lvl_num = LevelNum::Level4;
         } else { }
 
