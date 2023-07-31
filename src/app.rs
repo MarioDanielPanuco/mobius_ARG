@@ -138,6 +138,8 @@ impl eframe::App for TemplateApp {
             ui.label(format!("Level 2: {}", passed_l2));
             ui.label(format!("Level 3: {}", passed_l3));
             ui.label(format!("Level 4: {}", passed_l4));
+            ui.label("Checkout the github repo's readme.md to more info on site usage");
+            ui.hyperlink("https://github.com/MarioDanielPanuco/mobius_ARG");
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
